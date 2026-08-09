@@ -1,0 +1,48 @@
+{
+  "name": "ezbookkeeping-mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Production-oriented independent MCP server for ezBookkeeping HTTP API",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "bin": {
+    "ezbookkeeping-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "start:http": "MCP_TRANSPORT=http node dist/index.js",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test --test-reporter=spec test/*.test.ts",
+    "test:coverage": "node --import tsx --test --experimental-test-coverage test/*.test.ts",
+    "ci": "npm run verify:sdk && npm run lint && npm run typecheck && npm run test:coverage && npm run build",
+    "test:real": "tsx scripts/real-smoke.ts",
+    "verify:sdk": "node -e \"Promise.all([import('@modelcontextprotocol/sdk/client/index.js'),import('@modelcontextprotocol/sdk/server/mcp.js'),import('zod')]).catch((error)=>{console.error(error);process.exit(1)})\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.25.1",
+    "@types/express": "5.0.6",
+    "@types/node": "22.15.3",
+    "eslint": "9.25.1",
+    "tsx": "4.19.3",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.31.0"
+  }
+}

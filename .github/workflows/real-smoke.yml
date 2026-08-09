@@ -1,0 +1,37 @@
+name: Real ezBookkeeping smoke test
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: Runner that can reach ezBookkeeping
+        required: true
+        type: choice
+        default: ubuntu-latest
+        options:
+          - ubuntu-latest
+          - self-hosted
+
+permissions:
+  contents: read
+
+jobs:
+  read-only-smoke:
+    runs-on: ${{ inputs.runner }}
+    environment: pre-production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run build
+      - name: Read-only MCP smoke test against real server
+        env:
+          EZBK_BASE_URL: ${{ secrets.EZBK_BASE_URL }}
+          EZBK_API_TOKEN: ${{ secrets.EZBK_API_TOKEN }}
+          EZBK_TIMEZONE: Asia/Tokyo
+        run: npm run test:real
